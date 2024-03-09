@@ -2,32 +2,35 @@
    UID
    (c) 2024 Juan M. Uribe
 
-   Settings for handling Rfid UID keys
+   Class for handling Rfid UID keys
  ***************************************************************/
 #pragma once
-#define REG_COUNT 10 // Maximum size of key
 #include <vector>
+#include <set>
 
 using namespace std;
 
 class UID_t
 {
-  private:
-    uint8_t keySize;
-    vector<uint8_t> keyUID;
+private:
+  uint8_t keySize;
+  vector<uint8_t> keyUID;
 
-  public:
-    uint8_t size();
-    void size(uint8_t size);
-    void printUID();
-    uint8_t keyValue(int i);
-    void keyValue(int i, uint8_t value);
-    void toString(String &s);
-    void toStringPretty(String &s);
-    bool fromString(const String &s);
-    friend bool operator==(const UID_t &uid1, const UID_t &uid2);
-    friend bool operator!=(const UID_t &uid1, const UID_t &uid2);
-    UID_t &operator=(const UID_t &value);
+public:
+  uint8_t size();
+  void size(uint8_t size);
+  void printUID();
+  uint8_t keyValue(int i);
+  void keyValue(int i, uint8_t value);
+  void toString(String &s);
+  void toStringPretty(String &s);
+  bool fromString(const String &s);
+  friend bool operator==(const UID_t &uid1, const UID_t &uid2);
+  friend bool operator!=(const UID_t &uid1, const UID_t &uid2);
+  friend bool operator<(const UID_t &uid1, const UID_t &uid2);
+  friend bool operator>(const UID_t &uid1, const UID_t &uid2);
+  UID_t &operator=(const UID_t &value);
+  bool belongs(const set<UID_t> validKeys);
 };
 
 uint8_t UID_t::size()
@@ -73,28 +76,30 @@ void UID_t::toString(String &s)
 void UID_t::toStringPretty(String &s)
 {
   char aux[10];
-  for (int i = 0; i < keySize-1; i++)
+  for (int i = 0; i < keySize - 1; i++)
   {
     sprintf(aux, "%02X ", keyUID[i]);
     s += aux;
   }
-  sprintf(aux, "%02X", keyUID[keySize-1]);
-  s+= aux;
+  sprintf(aux, "%02X", keyUID[keySize - 1]);
+  s += aux;
 }
-
 
 bool UID_t::fromString(const String &s)
 {
   // Check valid characters and remove spaces
   String auxString;
-  for (int i = 0; i < s.length(); i++) {
-    if (int(s[i]) != 0x20 && isxdigit(s[i])) {
+  for (int i = 0; i < s.length(); i++)
+  {
+    if (int(s[i]) != 0x20 && isxdigit(s[i]))
+    {
       auxString += s[i];
     }
   }
   // Check the proper length
   uint16_t len = auxString.length() / 2;
-  if ((len != 4) && (len != 7) && (len != 10) || (auxString.length() % 2 != 0)) {
+  if ((len != 4) && (len != 7) && (len != 10) || (auxString.length() % 2 != 0))
+  {
     return false;
   }
   // Convert
@@ -112,7 +117,7 @@ bool UID_t::fromString(const String &s)
   return true;
 }
 
-bool operator!=(const UID_t & uid1, const UID_t & uid2)
+bool operator!=(const UID_t &uid1, const UID_t &uid2)
 {
   bool result = false;
   if (uid1.keySize != uid2.keySize)
@@ -128,14 +133,29 @@ bool operator!=(const UID_t & uid1, const UID_t & uid2)
   return result;
 }
 
-bool operator==(const UID_t & uid1, const UID_t & uid2)
+bool operator==(const UID_t &uid1, const UID_t &uid2)
 {
   return !(uid1 != uid2);
 }
 
-UID_t &UID_t::operator=(const UID_t & value)
+bool operator<(const UID_t &uid1, const UID_t &uid2)
+{
+  return uid1.keySize < uid2.keySize;
+}
+
+bool operator>(const UID_t &uid1, const UID_t &uid2)
+{
+  return uid1.keySize > uid2.keySize;
+}
+
+UID_t &UID_t::operator=(const UID_t &value)
 {
   keySize = value.keySize;
   keyUID = value.keyUID;
   return *this;
+}
+
+bool UID_t::belongs(const set<UID_t> validKeys)
+{
+  return validKeys.find(*this) != validKeys.end();
 }
