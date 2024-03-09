@@ -13,23 +13,27 @@ void setup()
     UID_t auxUid;
     String s;
 
+    Serial.printf("Número de llaves: %d\n", validKeys.size());
     if (auxUid.fromString(sUid))
     {
         auxUid.printUID();
         auxUid.toStringPretty(s);
-        validKeys.insert(auxUid);
-        Serial.printf("Insertada como válida la llave %s\r\n", s);
+        if (auxUid.insertInto(validKeys))
+            Serial.printf("Insertada como válida la llave %s\r\n", s);
+        else
+            Serial.printf("No se ha podido insertar como válida la llave %s\r\n", s);
     }
-    else
-        Serial.println("LLave no válida");
+    Serial.printf("Número de llaves: %d\n", validKeys.size());
 
-    if (auxUid.belongs(validKeys))
+    if (validKeys.find(auxUid) != validKeys.end())
         Serial.println("Llave permitida");
     else
         Serial.println("Llave no permitida");
 
     Serial.printf("Borrada como válida la llave %s\r\n", s);
-    validKeys.erase(auxUid);
+    auxUid.eraseFrom(validKeys);
+    Serial.printf("Número de llaves: %d\n", validKeys.size());
+
     if (auxUid.belongs(validKeys))
         Serial.println("Llave permitida");
     else

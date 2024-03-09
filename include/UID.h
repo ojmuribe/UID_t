@@ -17,20 +17,53 @@ private:
   vector<uint8_t> keyUID;
 
 public:
+  // Get the size of a key UID
   uint8_t size();
+
+  // Set the size of a key UID
   void size(uint8_t size);
+
+  // Print the key UID to Serial
   void printUID();
+
+  // Get the value of the position i of a key UID
   uint8_t keyValue(int i);
+
+  // Set the value of the position i of a key UID
   void keyValue(int i, uint8_t value);
+
+  // Converts a key UID into a string
   void toString(String &s);
+
+  // Set a string with a key UID
   void toStringPretty(String &s);
+
+  // Get a key UID from a string
   bool fromString(const String &s);
+
+  // Compairs if equal two key UIDs
   friend bool operator==(const UID_t &uid1, const UID_t &uid2);
+
+  // Compairs if not equal two key UIDs
   friend bool operator!=(const UID_t &uid1, const UID_t &uid2);
+
+  // Returns true if a key UID size is lower than other
   friend bool operator<(const UID_t &uid1, const UID_t &uid2);
+
+  // Returns true if a key UID size is greater than other
   friend bool operator>(const UID_t &uid1, const UID_t &uid2);
+
+  // Copy a key UID to another
   UID_t &operator=(const UID_t &value);
-  bool belongs(const set<UID_t> validKeys);
+
+  // Check if a key UID belongs to a set
+  bool belongs(const set<UID_t> &validKeys);
+
+  // Insert a key UID into a key UID set
+  bool insertInto(set<UID_t> &key);
+
+  // Erase a key UID from a key UID set
+  bool eraseFrom(set<UID_t> &key);
 };
 
 uint8_t UID_t::size()
@@ -155,7 +188,21 @@ UID_t &UID_t::operator=(const UID_t &value)
   return *this;
 }
 
-bool UID_t::belongs(const set<UID_t> validKeys)
+bool UID_t::belongs(const set<UID_t> &validKeys)
 {
   return validKeys.find(*this) != validKeys.end();
+}
+
+bool UID_t::insertInto(set<UID_t> &key)
+{
+  std::pair<std::set<UID_t>::iterator, bool> ret;
+  ret = key.insert(*this);
+  return ret.second;
+}
+
+bool UID_t::eraseFrom(set<UID_t> &key)
+{
+  int ret;
+  ret = key.erase(*this);
+  return ret != 0;
 }
