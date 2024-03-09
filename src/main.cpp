@@ -6,7 +6,7 @@ void setup()
     Serial.begin(115200);
 
     /* pruebecillas */
-    String sUid = "1fbbccdf";
+    String sUid = "prueba de github";
     UID_t auxUid;
     if (auxUid.fromString(sUid))
     {
